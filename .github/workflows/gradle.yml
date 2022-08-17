@@ -44,7 +44,7 @@ jobs:
 
         # [5]
       - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$timbucket0812/$GITHUB_SHA.zip
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://timbucket0812/$GITHUB_SHA.zip
 
         # [6]
       - name: Code Deploy
