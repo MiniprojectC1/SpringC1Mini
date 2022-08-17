@@ -53,7 +53,7 @@ public class MemberService {
     }
 
 
-    //Todo
+
     @Transactional
     public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
 
@@ -62,6 +62,7 @@ public class MemberService {
             return ResponseDto.fail("MEMBER_NOT_FOUND",
                     "사용자를 찾을 수 없습니다.");
         }
+
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(member);
         tokenToHeaders(tokenDto, response);
