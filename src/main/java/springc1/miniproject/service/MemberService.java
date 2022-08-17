@@ -70,6 +70,7 @@ public class MemberService {
                 MemberResponseDto.builder()
                         .id(member.getId())
                         .username(member.getUsername())
+                        .nickname(member.getNickname())
                         .createdAt(member.getCreatedAt())
                         .modifiedAt(member.getModifiedAt())
                         .build()

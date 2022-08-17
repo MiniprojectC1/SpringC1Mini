@@ -33,6 +33,7 @@ public class PostService {
 
         Member member = userDetails.getMember();
         Post post = new Post(requestDto, member);
+        postRepository.save(post);
 
         return ResponseDto.success( new PostResponseDto(post,null));
     }
