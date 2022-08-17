@@ -6,5 +6,5 @@ import springc1.miniproject.domain.Post;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByCategory(String category);
+    List<Post> findAllByOrderByModifiedAtDesc();
 }

@@ -58,9 +58,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseDto<?> getAllPost(String category) {
+    public ResponseDto<?> getAllPost() {
 
-        List<Post> postList = postRepository.findAllByCategory(category);
+        List<Post> postList = postRepository.findAllByOrderByModifiedAtDesc();
 
         List<PostAllResponseDto> posts = new ArrayList<>();
         for(Post post : postList){

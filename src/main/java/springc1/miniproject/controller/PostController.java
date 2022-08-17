@@ -35,9 +35,9 @@ public class PostController {
 
 
     //api 게시글 카테고리 조회
-    @GetMapping( "/api/posts/{category}")
-    public ResponseDto<?> getAllPosts(@PathVariable String category) {
-        return postService.getAllPost(category);
+    @GetMapping( "/api/posts")
+    public ResponseDto<?> getAllPosts() {
+        return postService.getAllPost();
     }
 
 
