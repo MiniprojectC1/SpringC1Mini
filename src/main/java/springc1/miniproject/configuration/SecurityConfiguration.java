@@ -25,7 +25,9 @@ import springc1.miniproject.jwt.JwtFilter;
 import springc1.miniproject.jwt.TokenProvider;
 import springc1.miniproject.service.UserDetailsServiceImpl;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 @Configuration
 @EnableWebSecurity
@@ -40,6 +42,12 @@ public class SecurityConfiguration {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationEntryPointException authenticationEntryPointException;
     private final AccessDeniedHandlerException accessDeniedHandlerException;
+
+    // JVM 기본 시간대를 변경
+    @PostConstruct
+    public void start() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
