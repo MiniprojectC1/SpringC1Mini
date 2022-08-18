@@ -13,6 +13,7 @@ import springc1.miniproject.controller.request.TokenDto;
 import springc1.miniproject.controller.response.MemberResponseDto;
 import springc1.miniproject.controller.response.ResponseDto;
 import springc1.miniproject.domain.Member;
+import springc1.miniproject.domain.Post;
 import springc1.miniproject.jwt.TokenProvider;
 import springc1.miniproject.repository.MemberRepository;
 
@@ -29,37 +30,26 @@ public class MemberService {
 
     @Transactional
     public ResponseDto<?> createMember(MemberRequestDto requestDto) {
-        if (null != isPresentMember(requestDto.getUsername())) {
-            return ResponseDto.fail("DUPLICATED_NICKNAME",
-                    "중복된 닉네임 입니다.");
-        }
 
-        Member member = Member.builder()
-                .username(requestDto.getUsername())
-                .nickname(requestDto.getNickname())
-                .password(passwordEncoder.encode(requestDto.getPassword()))
-                .build();
+        //중복된 닉네임 확인
+        isPresentMember(requestDto.getUsername());
+        // 멤버 생성
+        Member member = new Member(requestDto);
+        //db에 멤버 저장
         memberRepository.save(member);
         return ResponseDto.success( new MemberResponseDto(member));
 
     }
 
 
-
     @Transactional
     public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
 
-        Member member = isPresentMember(requestDto.getUsername());
-        if (null == member) {
-            return ResponseDto.fail("MEMBER_NOT_FOUND",
-                    "사용자를 찾을 수 없습니다.");
-        }
-        if (!member.validatePassword(passwordEncoder, requestDto.getPassword())) {
-            return ResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다.");
-        }
-
-
+        // 아이디 존재 확인 , 비밀번호 확인 , 로그인 검증
+        Member member = memberCheck(requestDto);
+        // 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(member);
+        // response header에 토큰 저장
         tokenToHeaders(tokenDto, response);
 
         return ResponseDto.success(new MemberResponseDto(member));
@@ -67,14 +57,37 @@ public class MemberService {
     }
 
 
+
+    // 중복된 닉네임 확인
     @Transactional(readOnly = true)
-    public Member isPresentMember(String username) {
+    public void isPresentMember(String username) {
         Optional<Member> optionalMember = memberRepository.findByUsername(username);
-        return optionalMember.orElse(null);
+        Member member = optionalMember.orElse(null);
+
+        if (null != member) {
+            throw new IllegalArgumentException("중복된 닉네임 입니다.");
+        }
     }
 
+
+    // 아이디 존재 확인 , 비밀번호 확인 , 로그인 검증
+    private Member memberCheck(LoginRequestDto requestDto) {
+        Optional<Member> optionalMember = memberRepository.findByUsername(requestDto.getUsername());
+         Member member = optionalMember.orElse(null);
+
+         if (member == null){
+             throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+         } else if (!member.validatePassword(passwordEncoder, requestDto.getPassword())){
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+         } else return member;
+
+    }
+
+    // response header에 토큰 저장
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
         response.addHeader("AccessToken", "Bearer " + tokenDto.getAccessToken());
     }
+
+
 
 }

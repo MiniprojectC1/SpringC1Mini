@@ -31,8 +31,11 @@ public class PostService {
     @Transactional
     public ResponseDto<?> createPost(PostRequestDto requestDto, UserDetailsImpl userDetails ){
 
+        // 로그인된 멤버 정보 가져오기
         Member member = userDetails.getMember();
+        // 새로운 post 생성
         Post post = new Post(requestDto, member);
+        // db에 post 저장
         postRepository.save(post);
 
         return ResponseDto.success( new PostResponseDto(post,null));
@@ -42,8 +45,9 @@ public class PostService {
     @Transactional(readOnly = true)
     public ResponseDto<?> getPost(Long id) {
 
+        // id 로 게시글 존재 유무 확인
         Post post = isPresentPost(id);
-
+        // 게시글에 작성된 댓글 모두 가져오기
         List<CommentResponseDto> comments = getAllCommentsByPost(post);
 
         return ResponseDto.success( new PostResponseDto(post, comments));
@@ -54,8 +58,9 @@ public class PostService {
     @Transactional(readOnly = true)
     public ResponseDto<?> getAllPost() {
 
+        // db에 있는 모든 post 가져오기
         List<Post> postList = postRepository.findAllByOrderByModifiedAtDesc();
-
+        // Comment 개수 check 후 postResponse 생성
         List<PostAllResponseDto> posts = getAllPosts(postList);
 
         return ResponseDto.success(posts);
@@ -67,11 +72,14 @@ public class PostService {
     public ResponseDto<?> updatePost(Long id, PostRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
+
+        // id 로 게시글 존재 유무 확인
         Post post = isPresentPost(id);
+        // 게시글 작성자만이 수정 ,삭제 가능
         memberValidatePost(member, post);
-
+        // 게시글에 작성된 댓글 모두 가져오기
         List<CommentResponseDto> comments = getAllCommentsByPost(post);
-
+        // post 업데이트
         post.update(requestDto);
         return ResponseDto.success( new PostResponseDto(post,comments));
     }
@@ -81,9 +89,12 @@ public class PostService {
     public ResponseDto<?> deletePost(Long id, UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
-        Post post = isPresentPost(id);
-        memberValidatePost(member, post);
 
+        // id 로 게시글 존재 유무 확인
+        Post post = isPresentPost(id);
+        // 게시글 작성자만이 수정 ,삭제 가능
+        memberValidatePost(member, post);
+        // post 삭제
         postRepository.delete(post);
         return ResponseDto.success("delete success");
 

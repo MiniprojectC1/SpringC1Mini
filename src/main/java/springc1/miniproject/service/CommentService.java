@@ -45,12 +45,13 @@ public class CommentService {
     public ResponseDto<?> updateComment(Long id, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
-
+        // id 로 댓글 존재 유무 확인
         postService.isPresentPost(requestDto.getPostId());
-
+        // id 로 댓글 존재 유무 확인
         Comment comment = isPresentComment(id);
+        // 댓글 작성자만이 수정 가능
         memberValidateComment(member, comment);
-
+        // 댓글 업데이트
         comment.update(requestDto);
         return ResponseDto.success(new CommentResponseDto(comment));
     }
@@ -61,17 +62,18 @@ public class CommentService {
 
         Member member = userDetails.getMember();
 
+        // id 로 댓글 존재 유무 확인
         Comment comment = isPresentComment(id);
+        // 댓글 작성자만이 수정 삭제 가능
         memberValidateComment(member, comment);
-
+        // 댓글 삭제
         commentRepository.delete(comment);
         return ResponseDto.success("success");
 
     }
 
 
-
-    // id 로 게시글 존재 유무 확인
+    // id 로 댓글 존재 유무 확인
     @Transactional(readOnly = true)
     public Comment isPresentComment(Long id) {
 

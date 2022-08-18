@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import springc1.miniproject.controller.request.MemberRequestDto;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -47,5 +48,11 @@ public class Member extends Timestamped {
 
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
+    }
+
+    public Member(MemberRequestDto requestDto) {
+        this.username = requestDto.getUsername();
+        this.nickname = requestDto.getNickname();
+        this.password = requestDto.getPassword();
     }
 }
