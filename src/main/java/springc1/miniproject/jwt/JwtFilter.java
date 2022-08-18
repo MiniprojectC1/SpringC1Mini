@@ -67,10 +67,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
       // SecurityContextHolder 안의  SecurityContext 에 authentication 저장
       SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
 
-    // 다음 필터 진행
-    filterChain.doFilter(request, response);
+    }
+      // 다음 필터 진행
+      filterChain.doFilter(request, response);
   }
 
   //header에 Access-Token 키 값을 가지는 value 값을 return , 이때 Bearer 뒤의 값만 return
