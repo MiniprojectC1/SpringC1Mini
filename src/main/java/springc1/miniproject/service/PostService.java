@@ -43,56 +43,34 @@ public class PostService {
     public ResponseDto<?> getPost(Long id) {
 
         Post post = isPresentPost(id);
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
-        }
 
-        List<Comment> commentList = commentRepository.findAllByPost(post);
-        List<CommentResponseDto> comments = new ArrayList<>();
-
-        for (Comment comment : commentList) {
-            comments.add(new CommentResponseDto(comment));
-        }
+        List<CommentResponseDto> comments = getAllCommentsByPost(post);
 
         return ResponseDto.success( new PostResponseDto(post, comments));
 
     }
+
 
     @Transactional(readOnly = true)
     public ResponseDto<?> getAllPost() {
 
         List<Post> postList = postRepository.findAllByOrderByModifiedAtDesc();
 
-        List<PostAllResponseDto> posts = new ArrayList<>();
-        for(Post post : postList){
-            List<Comment> commentList = commentRepository.findAllByPost(post);
-            posts.add( new PostAllResponseDto(post, commentList));
-        }
+        List<PostAllResponseDto> posts = getAllPosts(postList);
 
         return ResponseDto.success(posts);
     }
+
 
 
     @Transactional
     public ResponseDto<?> updatePost(Long id, PostRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
-
         Post post = isPresentPost(id);
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "post id is not exist");
-        }
+        memberValidatePost(member, post);
 
-        if (post.validateMember(member)) {
-            return ResponseDto.fail("BAD_REQUEST", "only author can update");
-        }
-
-        List<Comment> commentList = commentRepository.findAllByPost(post);
-        List<CommentResponseDto> comments = new ArrayList<>();
-
-        for (Comment comment : commentList) {
-            comments.add( new CommentResponseDto(comment));
-        }
+        List<CommentResponseDto> comments = getAllCommentsByPost(post);
 
         post.update(requestDto);
         return ResponseDto.success( new PostResponseDto(post,comments));
@@ -103,26 +81,56 @@ public class PostService {
     public ResponseDto<?> deletePost(Long id, UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
-
         Post post = isPresentPost(id);
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "post id is not exist");
-        }
-
-        if (post.validateMember(member)) {
-            return ResponseDto.fail("BAD_REQUEST", "only author can delete");
-        }
+        memberValidatePost(member, post);
 
         postRepository.delete(post);
         return ResponseDto.success("delete success");
 
     }
 
+
         // id 로 게시글 존재 유무 확인
     @Transactional(readOnly = true)
     public Post isPresentPost(Long id) {
-        Optional<Post> optionalPost = postRepository.findById(id);
-        return optionalPost.orElse(null);
+
+            Optional<Post> optionalPost = postRepository.findById(id);
+            Post post = optionalPost.orElse(null);
+
+        if (null == post) {
+            throw new IllegalArgumentException("존재하지 않는 게시글 id 입니다");
+        } else{
+            return post;
+        }
+    }
+
+        // 게시글 작성자만이 수정 ,삭제 가능
+    @Transactional(readOnly = true)
+    public void memberValidatePost(Member member, Post post) {
+        if (post.validateMember(member)) {
+            throw new IllegalArgumentException("게시글 작성자가 아닙니다");
+        }
+    }
+
+     // 게시글에 작성된 댓글 모두 가져오기
+    private List<CommentResponseDto> getAllCommentsByPost(Post post) {
+        List<Comment> commentList = commentRepository.findAllByPost(post);
+        List<CommentResponseDto> comments = new ArrayList<>();
+
+        for (Comment comment : commentList) {
+            comments.add(new CommentResponseDto(comment));
+        }
+        return comments;
+    }
+
+    // Comment 개수 check 후 모든 Post 가져오기
+    private List<PostAllResponseDto> getAllPosts(List<Post> postList) {
+        List<PostAllResponseDto> posts = new ArrayList<>();
+        for(Post post : postList){
+            List<Comment> commentList = commentRepository.findAllByPost(post);
+            posts.add( new PostAllResponseDto(post, commentList));
+        }
+        return posts;
     }
 
 

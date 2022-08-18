@@ -16,6 +16,7 @@ import java.util.List;
 public class PostResponseDto {
 
     private Long id;
+    private String username;
     private String nickname;
     private String title;
     private String content;
@@ -27,6 +28,7 @@ public class PostResponseDto {
 
     public PostResponseDto(Post post,List<CommentResponseDto> comments){
         this.id = post.getId();
+        this.username = post.getMember().getUsername();
         this.nickname = post.getMember().getNickname();
         this.title = post.getTitle();
         this.content = post.getContent();

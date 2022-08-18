@@ -25,7 +25,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
 
     @Transactional
@@ -41,15 +40,8 @@ public class MemberService {
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .build();
         memberRepository.save(member);
-        return ResponseDto.success(
-                MemberResponseDto.builder()
-                        .id(member.getId())
-                        .username(member.getUsername())
-                        .nickname(member.getNickname())
-                        .createdAt(member.getCreatedAt())
-                        .modifiedAt(member.getModifiedAt())
-                        .build()
-        );
+        return ResponseDto.success( new MemberResponseDto(member));
+
     }
 
 
@@ -66,18 +58,11 @@ public class MemberService {
             return ResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다.");
         }
 
+
         TokenDto tokenDto = tokenProvider.generateTokenDto(member);
         tokenToHeaders(tokenDto, response);
 
-        return ResponseDto.success(
-                MemberResponseDto.builder()
-                        .id(member.getId())
-                        .username(member.getUsername())
-                        .nickname(member.getNickname())
-                        .createdAt(member.getCreatedAt())
-                        .modifiedAt(member.getModifiedAt())
-                        .build()
-        );
+        return ResponseDto.success(new MemberResponseDto(member));
 
     }
 
