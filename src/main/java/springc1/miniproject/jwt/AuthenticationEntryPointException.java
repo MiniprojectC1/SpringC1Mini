@@ -22,7 +22,7 @@ public class AuthenticationEntryPointException implements
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response,
                        AuthenticationException authException) throws IOException {
-    String result = objectMapper.writeValueAsString(ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다~"));
+    String result = objectMapper.writeValueAsString(ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다!"));
     response.setContentType("application/json");
     response.setCharacterEncoding("utf-8");
     response.getWriter().write(result);
