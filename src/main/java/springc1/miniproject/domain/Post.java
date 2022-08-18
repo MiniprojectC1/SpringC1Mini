@@ -38,14 +38,6 @@ public class Post extends Timestamped {
         this.content = postRequestDto.getContent();
     }
 
-/*    public Post(PostRequestDto requestDto, Member member, String imgUrl) {
-
-        this.title = requestDto.getTitle();
-        this.content = requestDto.getContent();
-        this.category = requestDto.getCategory();
-        this.member = member;
-        this.imgUrl = imgUrl;
-    }*/
 
     public Post(PostRequestDto requestDto, Member member) {
 

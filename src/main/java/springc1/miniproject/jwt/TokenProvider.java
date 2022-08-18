@@ -19,7 +19,7 @@ public class TokenProvider {
 
   private static final String BEARER_PREFIX = "Bearer ";
   private final Key key;
-  private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 2;            // 2시간
+  private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
 //  private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 5;            // 5초
 
 
@@ -29,11 +29,11 @@ public class TokenProvider {
     this.key = Keys.hmacShaKeyFor(keyBytes);
   }
 
-  long now = (new Date().getTime());
 
   //Token 생성
   public TokenDto generateTokenDto(Member member) {
 
+    long now = (new Date().getTime());
     Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
     String accessToken = Jwts.builder()
         .setSubject(member.getUsername())

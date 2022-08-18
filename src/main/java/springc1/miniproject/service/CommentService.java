@@ -12,6 +12,7 @@ import springc1.miniproject.domain.Post;
 import springc1.miniproject.domain.UserDetailsImpl;
 import springc1.miniproject.jwt.TokenProvider;
 import springc1.miniproject.repository.CommentRepository;
+import springc1.miniproject.repository.PostRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -21,19 +22,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+
     private final PostService postService;
-    private final TokenProvider tokenProvider;
 
     @Transactional
     public ResponseDto<?> createComment(CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
-
         Post post = postService.isPresentPost(requestDto.getPostId());
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
-        }
-
 
         Comment comment = Comment.builder()
                 .member(member)
@@ -50,20 +46,10 @@ public class CommentService {
 
         Member member = userDetails.getMember();
 
-        Post post = postService.isPresentPost(requestDto.getPostId());
-        if (null == post) {
-            return ResponseDto.fail("NOT_FOUND", "post id is not exist");
-        }
+        postService.isPresentPost(requestDto.getPostId());
 
         Comment comment = isPresentComment(id);
-        if (null == comment) {
-            return ResponseDto.fail("NOT_FOUND", "comment id is not exist");
-        }
-
-        if (comment.validateMember(member)) {
-            return ResponseDto.fail("BAD_REQUEST", "only author can update");
-        }
-
+        memberValidateComment(member, comment);
 
         comment.update(requestDto);
         return ResponseDto.success(new CommentResponseDto(comment));
@@ -76,13 +62,7 @@ public class CommentService {
         Member member = userDetails.getMember();
 
         Comment comment = isPresentComment(id);
-        if (null == comment) {
-            return ResponseDto.fail("NOT_FOUND", "comment id is not exist");
-        }
-
-        if (comment.validateMember(member)) {
-            return ResponseDto.fail("BAD_REQUEST", "only author can update");
-        }
+        memberValidateComment(member, comment);
 
         commentRepository.delete(comment);
         return ResponseDto.success("success");
@@ -90,10 +70,28 @@ public class CommentService {
     }
 
 
+
+    // id 로 게시글 존재 유무 확인
     @Transactional(readOnly = true)
     public Comment isPresentComment(Long id) {
+
         Optional<Comment> optionalComment = commentRepository.findById(id);
-        return optionalComment.orElse(null);
+        Comment comment = optionalComment.orElse(null);
+
+        if (null == comment) {
+            throw new IllegalArgumentException("존재하지 않는 댓글 id 입니다");
+        } else{
+            return comment;
+        }
     }
+
+    // 댓글 작성자만이 수정 ,삭제 가능
+    @Transactional(readOnly = true)
+    public void memberValidateComment(Member member, Comment comment) {
+        if (comment.validateMember(member)) {
+            throw new IllegalArgumentException("댓글 작성자가 아닙니다");
+        }
+    }
+
 
     }
