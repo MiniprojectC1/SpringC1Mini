@@ -78,10 +78,8 @@ public class MemberService {
          Member member = optionalMember.orElse(null);
 
          if (member == null){
-             System.out.println("멤버 없음");
              throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
          } else if (!member.validatePassword(passwordEncoder, requestDto.getPassword())){
-             System.out.println("비밀번호 다름");
             throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
          } else return member;
 
