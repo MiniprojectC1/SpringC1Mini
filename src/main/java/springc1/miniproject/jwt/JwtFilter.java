@@ -57,7 +57,6 @@ public class JwtFilter extends OncePerRequestFilter {
       String subject = claims.getSubject();
       Collection<? extends GrantedAuthority> authorities = Collections.EMPTY_LIST;
 
-
       // subject에는 username 담겨있고 이를 이용해서 userDetailsService에서 UserDetails 반환
       UserDetails principal = userDetailsService.loadUserByUsername(subject);
 

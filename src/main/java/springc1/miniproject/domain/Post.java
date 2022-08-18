@@ -4,6 +4,7 @@ import lombok.*;
 import springc1.miniproject.controller.request.PostRequestDto;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Builder
 @Setter
@@ -32,6 +33,9 @@ public class Post extends Timestamped {
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 
     public void update(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();

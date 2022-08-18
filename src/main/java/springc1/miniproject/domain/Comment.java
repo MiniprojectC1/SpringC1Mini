@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import springc1.miniproject.controller.request.CommentRequestDto;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Builder
 @Getter

@@ -118,6 +118,8 @@ public class PostService {
         // 게시글 작성자만이 수정 ,삭제 가능
     @Transactional(readOnly = true)
     public void memberValidatePost(Member member, Post post) {
+        System.out.println(member.getUsername());
+        System.out.println(post.getMember().getUsername());
         if (post.validateMember(member)) {
             throw new IllegalArgumentException("게시글 작성자가 아닙니다");
         }
