@@ -19,6 +19,7 @@ import java.util.Objects;
 @Entity
 public class Member extends Timestamped {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,9 +51,9 @@ public class Member extends Timestamped {
         return passwordEncoder.matches(password, this.password);
     }
 
-    public Member(MemberRequestDto requestDto) {
+    public Member(MemberRequestDto requestDto, String password) {
         this.username = requestDto.getUsername();
         this.nickname = requestDto.getNickname();
-        this.password = requestDto.getPassword();
+        this.password = password;
     }
 }

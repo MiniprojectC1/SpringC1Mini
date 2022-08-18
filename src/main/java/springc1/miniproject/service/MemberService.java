@@ -33,8 +33,10 @@ public class MemberService {
 
         //중복된 닉네임 확인
         isPresentMember(requestDto.getUsername());
+        //패스워드 인코딩
+        String password = passwordEncoder.encode(requestDto.getPassword());
         // 멤버 생성
-        Member member = new Member(requestDto);
+        Member member = new Member(requestDto, password);
         //db에 멤버 저장
         memberRepository.save(member);
         return ResponseDto.success( new MemberResponseDto(member));
@@ -76,8 +78,10 @@ public class MemberService {
          Member member = optionalMember.orElse(null);
 
          if (member == null){
+             System.out.println("멤버 없음");
              throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
          } else if (!member.validatePassword(passwordEncoder, requestDto.getPassword())){
+             System.out.println("비밀번호 다름");
             throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
          } else return member;
 
